@@ -2,6 +2,7 @@ package io.kadach;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -20,34 +21,49 @@ import java.util.List;
 
 public class Game extends ApplicationAdapter {
 
-	private static final float CELL_SIZE = 2f;
+    private static final float CELL_SIZE = 1f;
+    private static final byte FIXED_CELL = 2;
+    private static final byte MOVING_CELL = 1;
+    private static final byte NONE_CELL = 0;
 
     private PerspectiveCamera cam;
     private ModelBatch modelBatch;
-    private Model model;
+    private Model movingCellModel;
+    private Model fixedCellModel;
     private List<ModelInstance> instances;
     private Environment environment;
+    private byte[][] currentShapeCords = {{2, 4, 1}, {0, 5, 1}, {1, 5, 1}, {2, 5, 1}};
     private byte[][][] map = {
             {
-                    {1, 0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0}
+            },
+            {
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0}
+            },
+            {
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0}
+            },
+            {
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0}
+            },
+            {
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 1, 0}
+            },
+            {
                     {0, 1, 0},
-                    {0, 0, 1}
-            },
-            {
-                    {1, 0, 0},
-                    {0, 0, 0},
-                    {0, 0, 0}
-            },
-            {
-                    {1, 0, 0},
-                    {0, 0, 0},
-                    {0, 0, 0}
-            },
-			{
-					{1, 0, 0},
-					{0, 0, 0},
-					{0, 0, 0}
-			}
+                    {0, 1, 0},
+                    {0, 1, 0}
+            }
     };
 
     @Override
@@ -65,19 +81,14 @@ public class Game extends ApplicationAdapter {
         cam.update();
 
         ModelBuilder modelBuilder = new ModelBuilder();
-        model = modelBuilder.createBox(CELL_SIZE, CELL_SIZE, CELL_SIZE,
+        movingCellModel = modelBuilder.createBox(CELL_SIZE, CELL_SIZE, CELL_SIZE,
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		instances = new LinkedList<>();
-        for (int x = 0; x < map.length; x++) {
-        	for (int y = 0; y < map[0].length; y++) {
-        		for (int z = 0; z < map[0][0].length; z++) {
-        			if (map[x][y][z] == 1) {
-						instances.add(new ModelInstance(model,  CELL_SIZE * x, CELL_SIZE * y, CELL_SIZE * z));
-					}
-				}
-			}
-		}
+        fixedCellModel = modelBuilder.createBox(CELL_SIZE, CELL_SIZE, CELL_SIZE,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        instances = new LinkedList<>();
+        visualizeMap();
     }
 
     @Override
@@ -87,14 +98,55 @@ public class Game extends ApplicationAdapter {
 
         modelBatch.begin(cam);
         for (ModelInstance instance : instances) {
-			modelBatch.render(instance, environment);
-		}
+            modelBatch.render(instance, environment);
+        }
         modelBatch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            step();
+        }
     }
 
     @Override
     public void dispose() {
         modelBatch.dispose();
-        model.dispose();
+        movingCellModel.dispose();
+    }
+
+    public void step() {
+        boolean moveShape = true;
+        for (int i = 0; i < currentShapeCords.length; i++) {
+            if (currentShapeCords[i][1] == 0 || map[currentShapeCords[i][1] - 1][currentShapeCords[i][0]][currentShapeCords[i][2]] == 2) {
+                moveShape = false;
+                break;
+            }
+        }
+        if (moveShape) {
+            for (int i = 0; i < currentShapeCords.length; i++) {
+                map[currentShapeCords[i][1] - 1][currentShapeCords[i][0]][currentShapeCords[i][2]] = 1;
+                map[currentShapeCords[i][1]][currentShapeCords[i][0]][currentShapeCords[i][2]] = 0;
+                currentShapeCords[i][1]--;
+            }
+        } else {
+            for (byte[] currentShapeCord : currentShapeCords) {
+                map[currentShapeCord[1]][currentShapeCord[0]][currentShapeCord[2]] = 2;
+            }
+        }
+        visualizeMap();
+    }
+
+    public void visualizeMap() {
+        instances.clear();
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[0].length; x++) {
+                for (int z = 0; z < map[0][0].length; z++) {
+                    if (map[y][x][z] == MOVING_CELL) {
+                        instances.add(new ModelInstance(movingCellModel, CELL_SIZE * x, CELL_SIZE * y, CELL_SIZE * z));
+                    } else if (map[y][x][z] == FIXED_CELL) {
+                        instances.add(new ModelInstance(fixedCellModel, CELL_SIZE * x, CELL_SIZE * y, CELL_SIZE * z));
+                    }
+                }
+            }
+        }
     }
 }
