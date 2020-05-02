@@ -21,12 +21,18 @@ public class Cell extends ModelInstance {
     }
 
     public void step() {
-        y--;
-        this.transform.setToTranslation(x * size, y * size, z * size);
+        changePosition(this.x, this.y - 1, this.z);
     }
 
     public void draw(ModelBatch modelBatch, Environment environment) {
         modelBatch.render(this, environment);
+    }
+
+    public void changePosition(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.transform.setToTranslation(this.x * size, this.y * size, this.z * size);
     }
 
     public int getX() {

@@ -37,4 +37,33 @@ public class Shape extends CellContainer {
 
         return step;
     }
+
+    public boolean moveLeft() {
+        return changePosition(-1, 0);
+    }
+
+    public boolean moveUp() {
+        return changePosition(0, -1);
+    }
+
+    public boolean moveRight() {
+        return changePosition(1, 0);
+    }
+
+    public boolean moveDown() {
+        return changePosition(0, 1);
+    }
+
+    private boolean changePosition(int dx, int dz) {
+        for (Cell cell : cells) {
+            if (!map.isFree(cell.getX() + dx, cell.getY(), cell.getZ() + dz)) {
+                return false;
+            }
+        }
+
+        for (Cell cell : cells) {
+            cell.changePosition(cell.getX() + dx, cell.getY(), cell.getZ() + dz);
+        }
+        return true;
+    }
 }

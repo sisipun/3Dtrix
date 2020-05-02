@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.Random;
 
@@ -35,24 +36,26 @@ public class Game extends ApplicationAdapter {
     private Shape currentShape;
     private CellMap cellMap;
     private byte[] initialPoint;
+    private Vector3 cameraAttentionPoint;
     private Random random;
 
     @Override
     public void create() {
+        random = new Random();
+        initialPoint = new byte[]{4, 12, 4};
+        cameraAttentionPoint = new Vector3(4, 0, 4);
+
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
         modelBatch = new ModelBatch();
 
-        camera = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(10f, 10f, 10f);
-        camera.lookAt(0, 0, 0);
+        camera = new PerspectiveCamera(90, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(15f, 15f, 15f);
+        camera.lookAt(cameraAttentionPoint);
         camera.near = 1f;
         camera.far = 300f;
         camera.update();
-
-        random = new Random();
-        initialPoint = new byte[]{4, 12, 4};
 
         ModelBuilder modelBuilder = new ModelBuilder();
         cellModel = modelBuilder.createBox(
@@ -78,6 +81,20 @@ public class Game extends ApplicationAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             step();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            currentShape.moveLeft();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            currentShape.moveUp();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            currentShape.moveRight();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            currentShape.moveDown();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            camera.rotateAround(cameraAttentionPoint, new Vector3(0, 1, 0), 10);
+            camera.update();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            camera.rotateAround(cameraAttentionPoint, new Vector3(0, 1, 0), -10);
+            camera.update();
         }
     }
 
@@ -90,6 +107,6 @@ public class Game extends ApplicationAdapter {
     public void step() {
         if (!currentShape.step()) {
             currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellModel, cellMap);
-        };
+        }
     }
 }

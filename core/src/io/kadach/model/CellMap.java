@@ -9,12 +9,16 @@ import static io.kadach.util.GameConstant.NONE_CELL;
 public class CellMap extends CellContainer {
 
     private byte[][][] map;
+    private int height;
+    private int width;
 
     public CellMap(int height, int width) {
+        this.height = height;
+        this.width = width;
         this.map = new byte[height][width][width];
-        for (int y = 0; y < map.length; y++) {
-            for (int x = 0; x < map[0].length; x++) {
-                for (int z = 0; z < map[0][0].length; z++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < width; z++) {
                     map[y][x][z] = NONE_CELL;
                 }
             }
@@ -29,6 +33,16 @@ public class CellMap extends CellContainer {
     }
 
     public boolean isFixed(int x, int y, int z) {
-        return map[y][x][z] == FIXED_CELL;
+        return x >= 0 && x < width
+                && y >= 0 && y < height
+                && z >= 0 && z < width
+                && map[y][x][z] == FIXED_CELL;
+    }
+
+    public boolean isFree(int x, int y, int z) {
+        return x >= 0 && x < width
+                && y >= 0 && y < height
+                && z >= 0 && z < width
+                && map[y][x][z] == NONE_CELL;
     }
 }
