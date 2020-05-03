@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.Random;
 
@@ -67,6 +68,12 @@ public class Game extends ApplicationAdapter {
         );
         cellMap = new CellMap(CELL_HEIGHT, CELL_WIDTH);
         currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellModel, cellMap);
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                step();
+            }
+        }, 1, 1);
     }
 
     @Override
