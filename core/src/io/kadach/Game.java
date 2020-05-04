@@ -26,7 +26,7 @@ import io.kadach.service.ShapeFactory;
 import static io.kadach.util.GameConstant.CELL_HEIGHT;
 import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.CELL_WIDTH;
-import static io.kadach.util.GameConstant.SHAPE_TYPES_COUNT;
+import static io.kadach.util.GameConstant.LINE_SHAPE;
 
 public class Game extends ApplicationAdapter {
 
@@ -43,8 +43,8 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
         random = new Random();
-        initialPoint = new byte[]{4, 12, 4};
-        cameraAttentionPoint = new Vector3(4, 0, 4);
+        initialPoint = new byte[]{1, 12, 1};
+        cameraAttentionPoint = new Vector3(1, 0, 1);
 
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -67,13 +67,13 @@ public class Game extends ApplicationAdapter {
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
         cellMap = new CellMap(CELL_HEIGHT, CELL_WIDTH);
-        currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellModel, cellMap);
+        currentShape = ShapeFactory.generateShape(LINE_SHAPE, initialPoint, cellMap);
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 step();
             }
-        }, 1, 1);
+        }, 0.5f, 0.2f);
     }
 
     @Override
@@ -82,8 +82,8 @@ public class Game extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(camera);
-        cellMap.draw(modelBatch, environment);
-        currentShape.draw(modelBatch, environment);
+        cellMap.draw(modelBatch, environment, cellModel);
+        currentShape.draw(modelBatch, environment, cellModel);
         modelBatch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -113,7 +113,8 @@ public class Game extends ApplicationAdapter {
 
     public void step() {
         if (!currentShape.step()) {
-            currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellModel, cellMap);
+            cellMap.removeFullSquare();
+            currentShape = ShapeFactory.generateShape(LINE_SHAPE, initialPoint, cellMap);
         }
     }
 }

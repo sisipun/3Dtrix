@@ -1,34 +1,72 @@
 package io.kadach.model;
 
-import io.kadach.model.base.Cell;
-import io.kadach.model.base.CellContainer;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 
+import io.kadach.model.base.Actor;
+
+import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.FIXED_CELL;
 import static io.kadach.util.GameConstant.NONE_CELL;
 
-public class CellMap extends CellContainer {
+public class CellMap extends Actor {
 
     private byte[][][] map;
     private int height;
     private int width;
+    private int highestCell;
 
     public CellMap(int height, int width) {
         this.height = height;
         this.width = width;
+        this.highestCell = 0;
         this.map = new byte[height][width][width];
         for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                for (int z = 0; z < width; z++) {
-                    map[y][x][z] = NONE_CELL;
-                }
-            }
+            resetLine(y);
         }
     }
 
-    public void fixShape(Shape shape) {
-        for (Cell cell : shape.getCells()) {
-            map[cell.getY()][cell.getX()][cell.getZ()] = FIXED_CELL;
-            cells.add(cell);
+    public int removeFullSquare() {
+        int fullSquareCount = 0;
+        int lastFullIndex = 0;
+        for (int y = 0; y <= highestCell; y++) {
+            if (isFullSquare(y)) {
+                fullSquareCount++;
+                lastFullIndex = y;
+            } else if (fullSquareCount != 0) {
+                byte[][] swap = map[y];
+                map[y] = map[lastFullIndex - fullSquareCount + 1];
+                map[lastFullIndex - fullSquareCount + 1] = swap;
+                lastFullIndex = y;
+            }
+        }
+
+        for (int i = 0; i < fullSquareCount; i++) {
+            resetLine(lastFullIndex - i);
+        }
+
+        return fullSquareCount;
+    }
+
+    public boolean isFullSquare(int y) {
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < width; z++) {
+                if (map[y][x][z] == NONE_CELL) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void addCells(int[][] cells) {
+        for (int[] cell : cells) {
+            map[cell[1]][cell[0]][cell[2]] = FIXED_CELL;
+            if (cell[1] > highestCell) {
+                highestCell = cell[1];
+            }
         }
     }
 
@@ -44,5 +82,26 @@ public class CellMap extends CellContainer {
                 && y >= 0 && y < height
                 && z >= 0 && z < width
                 && map[y][x][z] == NONE_CELL;
+    }
+
+    private void resetLine(int y) {
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < width; z++) {
+                map[y][x][z] = NONE_CELL;
+            }
+        }
+    }
+
+    @Override
+    public void draw(ModelBatch modelBatch, Environment environment, Model model) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < width; z++) {
+                    if (map[y][x][z] == FIXED_CELL) {
+                        modelBatch.render(new ModelInstance(model, x * CELL_SIZE, y * CELL_SIZE, z * CELL_SIZE), environment);
+                    };
+                }
+            }
+        }
     }
 }

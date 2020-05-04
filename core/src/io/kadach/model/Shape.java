@@ -1,38 +1,39 @@
 package io.kadach.model;
 
-import java.util.List;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 
-import io.kadach.model.base.Cell;
-import io.kadach.model.base.CellContainer;
+import io.kadach.model.base.Actor;
 
-public class Shape extends CellContainer {
+import static io.kadach.util.GameConstant.CELL_SIZE;
+
+public class Shape extends Actor {
 
     private final CellMap map;
+    private final int[][] cells;
 
-    public Shape(List<Cell> cells, CellMap map) {
+    public Shape(int[][] cells, CellMap map) {
         this.cells = cells;
         this.map = map;
     }
 
-    public List<Cell> getCells() {
-        return cells;
-    }
-
     public boolean step() {
         boolean step = true;
-        for (Cell cell : cells) {
-            if (cell.getY() == 0 || map.isFixed(cell.getX(), (cell.getY() - 1), cell.getZ())) {
+        for (int[] cell : cells) {
+            if (cell[1] == 0 || map.isFixed(cell[0], (cell[1] - 1), cell[2])) {
                 step = false;
                 break;
             }
         }
 
         if (step) {
-            for (Cell cell : cells) {
-                cell.step();
+            for (int[] cell : cells) {
+                cell[1]--;
             }
         } else {
-            map.fixShape(this);
+            map.addCells(cells);
         }
 
         return step;
@@ -55,15 +56,24 @@ public class Shape extends CellContainer {
     }
 
     private boolean changePosition(int dx, int dz) {
-        for (Cell cell : cells) {
-            if (!map.isFree(cell.getX() + dx, cell.getY(), cell.getZ() + dz)) {
+        for (int[] cell : cells) {
+            if (!map.isFree(cell[0] + dx, cell[1], cell[2] + dz)) {
                 return false;
             }
         }
 
-        for (Cell cell : cells) {
-            cell.changePosition(cell.getX() + dx, cell.getY(), cell.getZ() + dz);
+        for (int[] cell : cells) {
+            cell[0] += dx;
+            cell[2] += dz;
         }
+
         return true;
+    }
+
+    @Override
+    public void draw(ModelBatch modelBatch, Environment environment, Model model) {
+        for (int[] cell : cells) {
+            modelBatch.render(new ModelInstance(model, cell[0] * CELL_SIZE, cell[1] * CELL_SIZE, cell[2] * CELL_SIZE), environment);
+        }
     }
 }
