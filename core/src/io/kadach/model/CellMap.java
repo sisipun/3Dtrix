@@ -17,6 +17,7 @@ public class CellMap extends Actor {
     private int height;
     private int width;
     private int highestCell;
+    private boolean overflow;
 
     public CellMap(int height, int width) {
         this.height = height;
@@ -28,7 +29,7 @@ public class CellMap extends Actor {
         }
     }
 
-    public int removeFullSquare() {
+    public int removeFullSquares() {
         int fullSquareCount = 0;
         int lastFullIndex = 0;
         for (int y = 0; y <= highestCell; y++) {
@@ -50,6 +51,18 @@ public class CellMap extends Actor {
         return fullSquareCount;
     }
 
+    public void addCells(int[][] cells) {
+        for (int[] cell : cells) {
+            map[cell[1]][cell[0]][cell[2]] = FIXED_CELL;
+            if (cell[1] > highestCell) {
+                highestCell = cell[1];
+            }
+        }
+        if (highestCell >= height - 1) {
+            overflow = true;
+        }
+    }
+
     public boolean isFullSquare(int y) {
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < width; z++) {
@@ -59,15 +72,6 @@ public class CellMap extends Actor {
             }
         }
         return true;
-    }
-
-    public void addCells(int[][] cells) {
-        for (int[] cell : cells) {
-            map[cell[1]][cell[0]][cell[2]] = FIXED_CELL;
-            if (cell[1] > highestCell) {
-                highestCell = cell[1];
-            }
-        }
     }
 
     public boolean isFixed(int x, int y, int z) {
@@ -82,6 +86,10 @@ public class CellMap extends Actor {
                 && y >= 0 && y < height
                 && z >= 0 && z < width
                 && map[y][x][z] == NONE_CELL;
+    }
+
+    public boolean isOverflow() {
+        return overflow;
     }
 
     private void resetLine(int y) {
@@ -102,6 +110,15 @@ public class CellMap extends Actor {
                     };
                 }
             }
+        }
+    }
+
+    @Override
+    public void reset() {
+        this.overflow = false;
+        this.highestCell = 0;
+        for (int y = 0; y < height; y++) {
+            resetLine(y);
         }
     }
 }

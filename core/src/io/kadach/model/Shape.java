@@ -11,8 +11,8 @@ import static io.kadach.util.GameConstant.CELL_SIZE;
 
 public class Shape extends Actor {
 
-    private final CellMap map;
-    private final int[][] cells;
+    private CellMap map;
+    private int[][] cells;
 
     public Shape(int[][] cells, CellMap map) {
         this.cells = cells;
@@ -75,5 +75,10 @@ public class Shape extends Actor {
         for (int[] cell : cells) {
             modelBatch.render(new ModelInstance(model, cell[0] * CELL_SIZE, cell[1] * CELL_SIZE, cell[2] * CELL_SIZE), environment);
         }
+    }
+
+    @Override
+    public void reset() {
+        map = null;
     }
 }
