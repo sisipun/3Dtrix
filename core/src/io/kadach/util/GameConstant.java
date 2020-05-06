@@ -10,9 +10,11 @@ public class GameConstant {
     public static final byte NONE_CELL = 0;
 
     // Shape types
-    public static final byte SHAPE_TYPES_COUNT = 3;
+    public static final byte SHAPE_TYPES_COUNT = 5;
     public static final byte LINE_SHAPE = 0;
-    public static final byte SNAKE_LEFT_SHAPE = 1;
-    public static final byte SNAKE_RIGHT_SHAPE = 2;
+    public static final byte SNAKE_SHAPE = 1;
+    public static final byte BOX_SHAPE = 2;
+    public static final byte HORSE_SHAPE = 3;
+    public static final byte CROWN_SHAPE = 4;
 
 }
