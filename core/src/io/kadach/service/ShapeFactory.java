@@ -1,7 +1,12 @@
 package io.kadach.service;
 
 import io.kadach.model.CellMap;
-import io.kadach.model.Shape;
+import io.kadach.model.base.Shape;
+import io.kadach.model.shape.Box;
+import io.kadach.model.shape.Crown;
+import io.kadach.model.shape.Horse;
+import io.kadach.model.shape.Line;
+import io.kadach.model.shape.Snake;
 
 import static io.kadach.util.GameConstant.BOX_SHAPE;
 import static io.kadach.util.GameConstant.CROWN_SHAPE;
@@ -11,72 +16,41 @@ import static io.kadach.util.GameConstant.SNAKE_SHAPE;
 
 public class ShapeFactory {
 
-    public static Shape generateShape(byte type, byte[] initialPoint, CellMap map) {
-        assert initialPoint != null;
-        assert initialPoint.length == 3;
+    public static Shape generateShape(byte type, int x, int y, int z, CellMap map) {
         switch (type) {
             case LINE_SHAPE:
-                return generateLine(initialPoint, map);
+                return generateLine(x, y, z, map);
             case SNAKE_SHAPE:
-                return generateSnake(initialPoint, map);
+                return generateSnake(x, y, z, map);
             case BOX_SHAPE:
-                return generateBox(initialPoint, map);
+                return generateBox(x, y, z, map);
             case HORSE_SHAPE:
-                return generateHorse(initialPoint, map);
+                return generateHorse(x, y, z, map);
             case CROWN_SHAPE:
-                return generateCrown(initialPoint, map);
+                return generateCrown(x, y, z, map);
         }
 
         return null;
     }
 
-    private static Shape generateLine(byte[] initialPoint, CellMap map) {
-        return new Shape(new int[][]{
-                {initialPoint[0], initialPoint[1] - 3, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 2, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0], initialPoint[1], initialPoint[2]}
-        }, map);
+    private static Shape generateLine(int x, int y, int z, CellMap map) {
+        return new Line(x, y, z, map);
     }
 
-    private static Shape generateSnake(byte[] initialPoint, CellMap map) {
-        return new Shape(new int[][]{
-                {initialPoint[0], initialPoint[1] - 2, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0] - 1, initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0] - 1, initialPoint[1], initialPoint[2]}
-        }, map);
+    private static Shape generateSnake(int x, int y, int z, CellMap map) {
+        return new Snake(x, y, z, map);
     }
 
-    private static Shape generateBox(byte[] initialPoint, CellMap map) {
-        return new Shape(new int[][]{
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0] + 1, initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2] + 1},
-                {initialPoint[0] + 1, initialPoint[1] - 1, initialPoint[2] + 1},
-                {initialPoint[0], initialPoint[1], initialPoint[2]},
-                {initialPoint[0] + 1, initialPoint[1], initialPoint[2]},
-                {initialPoint[0], initialPoint[1], initialPoint[2] + 1},
-                {initialPoint[0] + 1, initialPoint[1], initialPoint[2] + 1},
-        }, map);
+    private static Shape generateBox(int x, int y, int z, CellMap map) {
+        return new Box(x, y, z, map);
     }
 
-    private static Shape generateHorse(byte[] initialPoint, CellMap map) {
-        return new Shape(new int[][]{
-                {initialPoint[0], initialPoint[1] - 2, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0], initialPoint[1], initialPoint[2]},
-                {initialPoint[0] + 1, initialPoint[1], initialPoint[2]}
-        }, map);
+    private static Shape generateHorse(int x, int y, int z, CellMap map) {
+        return new Horse(x, y, z, map);
     }
 
-    private static Shape generateCrown(byte[] initialPoint, CellMap map) {
-        return new Shape(new int[][]{
-                {initialPoint[0], initialPoint[1] - 2, initialPoint[2]},
-                {initialPoint[0], initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0] + 1, initialPoint[1] - 1, initialPoint[2]},
-                {initialPoint[0], initialPoint[1], initialPoint[2]}
-        }, map);
+    private static Shape generateCrown(int x, int y, int z, CellMap map) {
+        return new Crown(x, y, z, map);
     }
 
     private ShapeFactory() {

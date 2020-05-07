@@ -20,12 +20,12 @@ import com.badlogic.gdx.utils.Timer;
 import java.util.Random;
 
 import io.kadach.model.CellMap;
-import io.kadach.model.Shape;
+import io.kadach.model.base.Shape;
 import io.kadach.service.ShapeFactory;
 
-import static io.kadach.util.GameConstant.CELL_HEIGHT;
+import static io.kadach.util.GameConstant.CELL_MAP_HEIGHT;
 import static io.kadach.util.GameConstant.CELL_SIZE;
-import static io.kadach.util.GameConstant.CELL_WIDTH;
+import static io.kadach.util.GameConstant.CELL_MAP_WIDTH;
 import static io.kadach.util.GameConstant.SHAPE_TYPES_COUNT;
 
 public class Game extends ApplicationAdapter {
@@ -36,7 +36,9 @@ public class Game extends ApplicationAdapter {
     private Model cellModel;
     private Shape currentShape;
     private CellMap cellMap;
-    private byte[] initialPoint;
+    private int initialX;
+    private int initialY;
+    private int initialZ;
     private Vector3 cameraAttentionPoint;
     private Random random;
     private int score;
@@ -44,7 +46,9 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
         random = new Random();
-        initialPoint = new byte[]{1, 12, 1};
+        initialX = 1;
+        initialY = 12;
+        initialZ = 1;
         cameraAttentionPoint = new Vector3(1, 0, 1);
         score = 0;
 
@@ -68,8 +72,8 @@ public class Game extends ApplicationAdapter {
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
-        cellMap = new CellMap(CELL_HEIGHT, CELL_WIDTH);
-        currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellMap);
+        cellMap = new CellMap(CELL_MAP_HEIGHT, CELL_MAP_WIDTH);
+        currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -121,7 +125,7 @@ public class Game extends ApplicationAdapter {
                 cellMap.reset();
                 score = 0;
             }
-            currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialPoint, cellMap);
+            currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
         }
     }
 }

@@ -4,14 +4,15 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.utils.Pool;
 
-import io.kadach.model.base.Actor;
+import io.kadach.model.base.Drawable;
 
 import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.FIXED_CELL;
 import static io.kadach.util.GameConstant.NONE_CELL;
 
-public class CellMap extends Actor {
+public class CellMap implements Drawable, Pool.Poolable {
 
     private byte[][][] map;
     private int height;

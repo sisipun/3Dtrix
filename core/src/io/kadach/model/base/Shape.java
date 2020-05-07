@@ -1,15 +1,16 @@
-package io.kadach.model;
+package io.kadach.model.base;
 
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.utils.Pool;
 
-import io.kadach.model.base.Actor;
+import io.kadach.model.CellMap;
 
 import static io.kadach.util.GameConstant.CELL_SIZE;
 
-public class Shape extends Actor {
+public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
 
     private CellMap map;
     private int[][] cells;
