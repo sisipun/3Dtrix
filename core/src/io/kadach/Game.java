@@ -24,8 +24,8 @@ import io.kadach.model.base.Shape;
 import io.kadach.service.ShapeFactory;
 
 import static io.kadach.util.GameConstant.CELL_MAP_HEIGHT;
-import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.CELL_MAP_WIDTH;
+import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.SHAPE_TYPES_COUNT;
 
 public class Game extends ApplicationAdapter {
@@ -34,6 +34,7 @@ public class Game extends ApplicationAdapter {
     private Environment environment;
     private ModelBatch modelBatch;
     private Model cellModel;
+    private Model mapModel;
     private Shape currentShape;
     private CellMap cellMap;
     private int initialX;
@@ -46,10 +47,10 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
         random = new Random();
-        initialX = 1;
+        initialX = 3;
         initialY = 12;
-        initialZ = 1;
-        cameraAttentionPoint = new Vector3(1, 0, 1);
+        initialZ = 3;
+        cameraAttentionPoint = new Vector3(3, 0, 3);
         score = 0;
 
         environment = new Environment();
@@ -72,6 +73,13 @@ public class Game extends ApplicationAdapter {
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
+        mapModel = modelBuilder.createBox(
+                CELL_SIZE,
+                CELL_SIZE,
+                CELL_SIZE,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
         cellMap = new CellMap(CELL_MAP_HEIGHT, CELL_MAP_WIDTH);
         currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
         Timer.schedule(new Timer.Task() {
@@ -89,13 +97,11 @@ public class Game extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(camera);
-        cellMap.draw(modelBatch, environment, cellModel);
+        cellMap.draw(modelBatch, environment, mapModel);
         currentShape.draw(modelBatch, environment, cellModel);
         modelBatch.end();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            step();
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             currentShape.moveLeft();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             currentShape.moveUp();
@@ -109,6 +115,12 @@ public class Game extends ApplicationAdapter {
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             camera.rotateAround(cameraAttentionPoint, new Vector3(0, 1, 0), -10);
             camera.update();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            while (step());
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+            currentShape.rotateRight();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+            currentShape.rotateLeft();
         }
     }
 
@@ -118,7 +130,7 @@ public class Game extends ApplicationAdapter {
         cellModel.dispose();
     }
 
-    public void step() {
+    public boolean step() {
         if (!currentShape.step()) {
             score += cellMap.removeFullSquares();
             if (cellMap.isOverflow()) {
@@ -126,6 +138,8 @@ public class Game extends ApplicationAdapter {
                 score = 0;
             }
             currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
+            return false;
         }
+        return true;
     }
 }

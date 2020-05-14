@@ -12,8 +12,8 @@ import static io.kadach.util.GameConstant.CELL_SIZE;
 
 public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
 
-    private CellMap map;
-    private int[][] cells;
+    protected CellMap map;
+    protected int[][] cells;
 
     public Shape(int[][] cells, CellMap map) {
         this.cells = cells;

@@ -2,10 +2,8 @@ package io.kadach.model.base;
 
 public interface Rotatable {
     
-    boolean rotateX();
+    boolean rotateLeft();
     
-    boolean rotateY();
-    
-    boolean rotateZ();
+    boolean rotateRight();
     
 }

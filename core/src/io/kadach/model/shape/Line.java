@@ -14,17 +14,12 @@ public class Line extends Shape {
     }
 
     @Override
-    public boolean rotateX() {
+    public boolean rotateLeft() {
         return false;
     }
 
     @Override
-    public boolean rotateY() {
-        return false;
-    }
-
-    @Override
-    public boolean rotateZ() {
+    public boolean rotateRight() {
         return false;
     }
 }

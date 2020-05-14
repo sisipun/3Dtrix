@@ -3,7 +3,7 @@ package io.kadach.util;
 public class GameConstant {
 
     public static final int CELL_MAP_HEIGHT = 13;
-    public static final int CELL_MAP_WIDTH = 3;
+    public static final int CELL_MAP_WIDTH = 7;
 
     public static final float CELL_SIZE = 1f;
     public static final byte FIXED_CELL = 1;

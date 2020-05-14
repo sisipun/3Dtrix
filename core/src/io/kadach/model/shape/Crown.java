@@ -14,17 +14,30 @@ public class Crown extends Shape {
     }
 
     @Override
-    public boolean rotateX() {
+    public boolean rotateLeft() {
+        int dx = cells[2][0] - cells[1][0];
+        int dz = cells[2][2] - cells[1][2];
+
+        if (map.isFree(cells[2][0] - dz - dx, cells[2][1], cells[2][2] - dz + dx)) {
+            cells[2][0] -= dx + dz;
+            cells[2][2] -= dz - dx;
+            return true;
+        }
+
         return false;
     }
 
     @Override
-    public boolean rotateY() {
-        return false;
-    }
+    public boolean rotateRight() {
+        int dx = cells[2][0] - cells[1][0];
+        int dz = cells[2][2] - cells[1][2];
 
-    @Override
-    public boolean rotateZ() {
+        if (map.isFree(cells[2][0] + dz - dx, cells[2][1], cells[2][2] - dz + dx)) {
+            cells[2][0] += dz - dx;
+            cells[2][2] -= dz + dx;
+            return true;
+        }
+
         return false;
     }
 }

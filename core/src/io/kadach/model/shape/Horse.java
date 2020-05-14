@@ -14,17 +14,30 @@ public class Horse extends Shape {
     }
 
     @Override
-    public boolean rotateX() {
+    public boolean rotateLeft() {
+        int dx = cells[3][0] - cells[2][0];
+        int dz = cells[3][2] - cells[2][2];
+
+        if (map.isFree(cells[3][0] - dz - dx, cells[3][1], cells[3][2] - dz + dx)) {
+            cells[3][0] -= dx + dz;
+            cells[3][2] -= dz - dx;
+            return true;
+        }
+
         return false;
     }
 
     @Override
-    public boolean rotateY() {
-        return false;
-    }
+    public boolean rotateRight() {
+        int dx = cells[3][0] - cells[2][0];
+        int dz = cells[3][2] - cells[2][2];
 
-    @Override
-    public boolean rotateZ() {
+        if (map.isFree(cells[3][0] + dz - dx, cells[3][1], cells[3][2] - dz + dx)) {
+            cells[3][0] += dz - dx;
+            cells[3][2] -= dz + dx;
+            return true;
+        }
+
         return false;
     }
 }
