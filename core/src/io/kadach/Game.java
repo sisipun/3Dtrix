@@ -35,7 +35,9 @@ public class Game extends ApplicationAdapter {
     private ModelBatch modelBatch;
     private Model cellModel;
     private Model mapModel;
+    private Model shadowModel;
     private Shape currentShape;
+    private Shape shapeShadow;
     private CellMap cellMap;
     private int initialX;
     private int initialY;
@@ -80,8 +82,15 @@ public class Game extends ApplicationAdapter {
                 new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
+        shadowModel = modelBuilder.createBox(
+                CELL_SIZE,
+                CELL_SIZE,
+                CELL_SIZE,
+                new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
         cellMap = new CellMap(CELL_MAP_HEIGHT, CELL_MAP_WIDTH);
-        currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
+        generateShape();
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -97,18 +106,23 @@ public class Game extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(camera);
+        shapeShadow.draw(modelBatch, environment, shadowModel);
         cellMap.draw(modelBatch, environment, mapModel);
         currentShape.draw(modelBatch, environment, cellModel);
         modelBatch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             currentShape.moveLeft();
+            updateShape();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             currentShape.moveUp();
+            updateShape();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
             currentShape.moveRight();
+            updateShape();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             currentShape.moveDown();
+            updateShape();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             camera.rotateAround(cameraAttentionPoint, new Vector3(0, 1, 0), 10);
             camera.update();
@@ -116,11 +130,13 @@ public class Game extends ApplicationAdapter {
             camera.rotateAround(cameraAttentionPoint, new Vector3(0, 1, 0), -10);
             camera.update();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            while (step());
+            while (step()) ;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
             currentShape.rotateRight();
+            updateShape();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
             currentShape.rotateLeft();
+            updateShape();
         }
     }
 
@@ -130,16 +146,29 @@ public class Game extends ApplicationAdapter {
         cellModel.dispose();
     }
 
-    public boolean step() {
+    private boolean step() {
         if (!currentShape.step()) {
+            cellMap.addCells(currentShape);
             score += cellMap.removeFullSquares();
             if (cellMap.isOverflow()) {
                 cellMap.reset();
                 score = 0;
             }
-            currentShape = ShapeFactory.generateShape((byte) random.nextInt(SHAPE_TYPES_COUNT), initialX, initialY, initialZ, cellMap);
+            generateShape();
             return false;
         }
         return true;
+    }
+
+    private void generateShape() {
+        byte type = (byte) random.nextInt(SHAPE_TYPES_COUNT);
+        currentShape = ShapeFactory.generateShape(type, initialX, initialY, initialZ, cellMap);
+        shapeShadow = ShapeFactory.generateShape(type, initialX, initialY, initialZ, cellMap);
+        while (shapeShadow.step()) ;
+    }
+
+    private void updateShape() {
+        shapeShadow.clone(currentShape);
+        while (shapeShadow.step()) ;
     }
 }

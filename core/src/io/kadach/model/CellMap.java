@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.utils.Pool;
 
 import io.kadach.model.base.Drawable;
+import io.kadach.model.base.Shape;
 
 import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.FIXED_CELL;
@@ -52,8 +53,8 @@ public class CellMap implements Drawable, Pool.Poolable {
         return fullSquareCount;
     }
 
-    public void addCells(int[][] cells) {
-        for (int[] cell : cells) {
+    public void addCells(Shape shape) {
+        for (int[] cell : shape.getCells()) {
             map[cell[1]][cell[0]][cell[2]] = FIXED_CELL;
             if (cell[1] > highestCell) {
                 highestCell = cell[1];

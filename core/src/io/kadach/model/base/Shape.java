@@ -20,6 +20,16 @@ public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
         this.map = map;
     }
 
+    public void clone(Shape shape) {
+        this.cells = new int[shape.cells.length][shape.cells[0].length];
+        for (int i = 0; i < shape.cells.length; i++) {
+            for (int j = 0; j < shape.cells[0].length; j++) {
+                this.cells[i][j] = shape.cells[i][j];
+            }
+        }
+        this.map = shape.map;
+    }
+
     public boolean step() {
         boolean step = true;
         for (int[] cell : cells) {
@@ -33,8 +43,6 @@ public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
             for (int[] cell : cells) {
                 cell[1]--;
             }
-        } else {
-            map.addCells(cells);
         }
 
         return step;
@@ -81,5 +89,9 @@ public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
     @Override
     public void reset() {
         map = null;
+    }
+
+    public int[][] getCells() {
+        return cells;
     }
 }
