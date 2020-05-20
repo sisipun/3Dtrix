@@ -1,12 +1,19 @@
 package io.kadach.service;
 
-import io.kadach.model.CellMap;
+import com.badlogic.gdx.utils.Pools;
+
+import io.kadach.model.base.CellMap;
 import io.kadach.model.base.Shape;
 import io.kadach.model.shape.Box;
 import io.kadach.model.shape.Crown;
 import io.kadach.model.shape.Horse;
 import io.kadach.model.shape.Line;
 import io.kadach.model.shape.Snake;
+import io.kadach.pool.BoxPool;
+import io.kadach.pool.CrownPool;
+import io.kadach.pool.HorsePool;
+import io.kadach.pool.LinePool;
+import io.kadach.pool.SnakePool;
 
 import static io.kadach.util.GameConstant.BOX_SHAPE;
 import static io.kadach.util.GameConstant.CROWN_SHAPE;
@@ -15,6 +22,18 @@ import static io.kadach.util.GameConstant.LINE_SHAPE;
 import static io.kadach.util.GameConstant.SNAKE_SHAPE;
 
 public class ShapeFactory {
+
+    public static void init() {
+        Pools.set(Line.class, new LinePool());
+        Pools.set(Snake.class, new SnakePool());
+        Pools.set(Box.class, new BoxPool());
+        Pools.set(Horse.class, new HorsePool());
+        Pools.set(Crown.class, new CrownPool());
+    }
+
+    public static void free(Shape shape) {
+        Pools.free(shape);
+    }
 
     public static Shape generateShape(byte type, int x, int y, int z, CellMap map) {
         switch (type) {
@@ -34,23 +53,23 @@ public class ShapeFactory {
     }
 
     private static Shape generateLine(int x, int y, int z, CellMap map) {
-        return new Line(x, y, z, map);
+        return Pools.obtain(Line.class).init(x, y, z, map);
     }
 
     private static Shape generateSnake(int x, int y, int z, CellMap map) {
-        return new Snake(x, y, z, map);
+        return Pools.obtain(Snake.class).init(x, y, z, map);
     }
 
     private static Shape generateBox(int x, int y, int z, CellMap map) {
-        return new Box(x, y, z, map);
+        return Pools.obtain(Box.class).init(x, y, z, map);
     }
 
     private static Shape generateHorse(int x, int y, int z, CellMap map) {
-        return new Horse(x, y, z, map);
+        return Pools.obtain(Horse.class).init(x, y, z, map);
     }
 
     private static Shape generateCrown(int x, int y, int z, CellMap map) {
-        return new Crown(x, y, z, map);
+        return Pools.obtain(Crown.class).init(x, y, z, map);
     }
 
     private ShapeFactory() {

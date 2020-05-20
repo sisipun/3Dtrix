@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.utils.Pool;
 
-import io.kadach.model.CellMap;
-
 import static io.kadach.util.GameConstant.CELL_SIZE;
 
 public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
@@ -18,6 +16,12 @@ public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
     public Shape(int[][] cells, CellMap map) {
         this.cells = cells;
         this.map = map;
+    }
+
+    protected Shape init(int[][] cells, CellMap map) {
+        this.cells = cells;
+        this.map = map;
+        return this;
     }
 
     public void clone(Shape shape) {
@@ -89,6 +93,16 @@ public abstract class Shape implements Rotatable, Drawable, Pool.Poolable {
     @Override
     public void reset() {
         map = null;
+    }
+
+    @Override
+    public boolean rotateLeft() {
+        return false;
+    }
+
+    @Override
+    public boolean rotateRight() {
+        return false;
     }
 
     public int[][] getCells() {

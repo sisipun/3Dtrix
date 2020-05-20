@@ -15,12 +15,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Timer;
 
 import java.util.Random;
 
-import io.kadach.model.CellMap;
+import io.kadach.model.base.CellMap;
 import io.kadach.model.base.Shape;
+import io.kadach.pool.CellMapPool;
 import io.kadach.service.ShapeFactory;
 
 import static io.kadach.util.GameConstant.CELL_MAP_HEIGHT;
@@ -48,6 +50,9 @@ public class Game extends ApplicationAdapter {
 
     @Override
     public void create() {
+        ShapeFactory.init();
+        Pools.set(CellMap.class, new CellMapPool());
+
         random = new Random();
         initialX = 3;
         initialY = 12;
@@ -68,6 +73,7 @@ public class Game extends ApplicationAdapter {
         camera.update();
 
         ModelBuilder modelBuilder = new ModelBuilder();
+
         cellModel = modelBuilder.createBox(
                 CELL_SIZE,
                 CELL_SIZE,
@@ -89,7 +95,8 @@ public class Game extends ApplicationAdapter {
                 new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
-        cellMap = new CellMap(CELL_MAP_HEIGHT, CELL_MAP_WIDTH);
+
+        cellMap = Pools.obtain(CellMap.class).init(CELL_MAP_HEIGHT, CELL_MAP_WIDTH);
         generateShape();
         Timer.schedule(new Timer.Task() {
             @Override
@@ -161,6 +168,11 @@ public class Game extends ApplicationAdapter {
     }
 
     private void generateShape() {
+        if (currentShape != null) {
+            ShapeFactory.free(currentShape);
+            ShapeFactory.free(shapeShadow);
+        }
+
         byte type = (byte) random.nextInt(SHAPE_TYPES_COUNT);
         currentShape = ShapeFactory.generateShape(type, initialX, initialY, initialZ, cellMap);
         shapeShadow = ShapeFactory.generateShape(type, initialX, initialY, initialZ, cellMap);

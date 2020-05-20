@@ -1,13 +1,10 @@
-package io.kadach.model;
+package io.kadach.model.base;
 
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.utils.Pool;
-
-import io.kadach.model.base.Drawable;
-import io.kadach.model.base.Shape;
 
 import static io.kadach.util.GameConstant.CELL_SIZE;
 import static io.kadach.util.GameConstant.FIXED_CELL;
@@ -29,6 +26,17 @@ public class CellMap implements Drawable, Pool.Poolable {
         for (int y = 0; y < height; y++) {
             resetLine(y);
         }
+    }
+
+    public CellMap init(int height, int width) {
+        this.height = height;
+        this.width = width;
+        this.highestCell = 0;
+        this.map = new byte[height][width][width];
+        for (int y = 0; y < height; y++) {
+            resetLine(y);
+        }
+        return this;
     }
 
     public int removeFullSquares() {
